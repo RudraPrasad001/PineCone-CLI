@@ -1,3 +1,4 @@
+import uuid
 from pinecone import Pinecone, ServerlessSpec
 from sentence_transformers import SentenceTransformer
 import time
@@ -11,7 +12,6 @@ EMBED_DIM = 384
 # Pinecone connection
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
-pc.delete_index("policy-docs")
 
 # Create index if not exists
 if INDEX_NAME not in [i.name for i in pc.list_indexes()]:
@@ -37,7 +37,8 @@ def embed_text(text: str) -> list[float]:
     return model.encode(text).tolist()
 
 #chunck into pinecone
-def store_chunk(chunk_id: str, chunk_text: str):
+def store_chunk(chunk_text: str):
+    chunk_id = str(uuid.uuid4())
     vector = embed_text(chunk_text)
     index.upsert([
         {
@@ -70,9 +71,8 @@ def main():
         choice = input("Enter choice [1-4]: ").strip()
 
         if choice == "1":
-            cid = input("Enter chunk ID: ").strip()
             ctext = input("Enter chunk text: ").strip()
-            store_chunk(cid, ctext)
+            store_chunk(ctext)
 
         elif choice == "2":
             text = input("Enter text to embed: ").strip()
