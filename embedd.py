@@ -37,6 +37,9 @@ def embed_text(text: str) -> list[float]:
     return model.encode(text).tolist()
 
 #chunck into pinecone
+def store_chunks(chunks : list[str]):
+    for chunk in chunks:
+        store_chunk(chunk_text=chunk)
 def store_chunk(chunk_text: str):
     chunk_id = str(uuid.uuid4())
     vector = embed_text(chunk_text)
